@@ -13,6 +13,7 @@ class TranscriptChunkSerializer(serializers.ModelSerializer):
 
 
 class TranscriptSessionSerializer(serializers.ModelSerializer):
+    """Full session detail — includes nested chunks."""
     chunks = TranscriptChunkSerializer(many=True, read_only=True)
 
     class Meta:
@@ -20,5 +21,16 @@ class TranscriptSessionSerializer(serializers.ModelSerializer):
         fields = [
             "id", "created_at", "ended_at", "language",
             "full_transcript", "is_active", "speaker_label", "chunks",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
+class TranscriptSessionListSerializer(serializers.ModelSerializer):
+    """Lightweight session list — no nested chunks."""
+    class Meta:
+        model = TranscriptSession
+        fields = [
+            "id", "created_at", "ended_at", "language",
+            "full_transcript", "is_active", "speaker_label",
         ]
         read_only_fields = ["id", "created_at"]
