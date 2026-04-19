@@ -1,7 +1,8 @@
 """
 WhisperTranscriber — singleton wrapper around OpenAI Whisper.
+All heavy imports (numpy, whisper, torch) are deferred to first use
+so Django can start without ML dependencies installed.
 """
-import numpy as np
 from dataclasses import dataclass, field
 
 
@@ -31,12 +32,14 @@ class WhisperTranscriber:
             )
         return cls._instance
 
-    def _bytes_to_audio_array(self, audio_bytes: bytes) -> np.ndarray:
+    def _bytes_to_audio_array(self, audio_bytes: bytes):
         """Convert raw PCM 16-bit LE bytes to float32 array in [-1.0, 1.0]."""
+        import numpy as np
         if len(audio_bytes) == 0 or len(audio_bytes) % 2 != 0:
             raise ValueError(
                 f"Malformed PCM bytes: length {len(audio_bytes)} is not a multiple of 2."
             )
+        import numpy as np
         audio_int16 = np.frombuffer(audio_bytes, dtype=np.int16)
         return audio_int16.astype(np.float32) / 32768.0
 
